@@ -33,7 +33,7 @@
       </div>
 
       <div class="category">
-        <h4 onclick="toggleCategory(this)">👵 Ancianos</h4>
+        <h4 onclick="toggleCategory(this)">👵 Tercera Edad</h4>
         <div class="category-content">
           <img src="./imagenes/viejo.jpg" />
           <img src="./imagenes/viejo.jpg" />
@@ -66,9 +66,14 @@
 
  <div class="modal" id="formModal">
   <div class="modal-content" id="modalContent">
+<div class="modal-content" id="modalContent">
+
     <h3 id="modalTitle">Comparte tu historia</h3>
 
     <!-- Agrupar los inputs dentro de #inputGroup -->
+         <!-- Botón de cerrar -->
+<button class="close-modal" onclick="cerrarModalFormulario()">×</button>
+
     <div id="inputGroup">
       <input type="text" id="name" placeholder="Tu nombre (opcional)">
       <input type="email" id="email" placeholder="Correo electrónico" required>
@@ -84,10 +89,12 @@
 <!-- Modal de Donación -->
 <div class="modal" id="donationModal">
   <div class="modal-content donation-modal">
+    <!-- Botón de cerrar -->
+
     <div class="donation-header">
       <span>Donación</span>
-      <button class="close-donation" onclick="cerrarModalDonacion()">×</button>
     </div>
+    <button class="close-modal" onclick="cerrarModalFormulario()">×</button>
     <div class="donation-body">
       <h3>Tu aporte marca la diferencia</h3>
       <p>

@@ -8,156 +8,78 @@ const modalTitle = document.getElementById("modalTitle");
 const inputGroup = document.getElementById("inputGroup");
 const submitBtn = document.getElementById("submitButton");
 
+const JSONBIN_API_KEY = '$2b$10$S9mIWcrd3Tm3KYY7nI0L1ufod9JArMsVG.S8LYwSh.TqbjpplH.Si'; // ⚠️ Solo para pruebas
+const BIN_ID = '61466bc34a82881d6c519a27';
+const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+
+let stories = {};
 let selectedKey = "";
-const stories = JSON.parse(localStorage.getItem("stories") || "{}");
 
-// Crear grid 25 x 20
-for (let row = 0; row < 20; row++) {
-  for (let col = 0; col < 25; col++) {
-    const key = `tile_${row}_${col}`;
-    const tile = document.createElement("div");
-    tile.classList.add("pixel");
-    tile.dataset.key = key;
-
-    const img = document.createElement("img");
-    img.src = `tiles/${key}.png`;
-    tile.appendChild(img);
-
-    if (stories[key]) {
-      tile.classList.add("revealed");
-    }
-
-    tile.onclick = () => {
-      selectedKey = key;
-
-      if (stories[key]) {
-        // Mostrar historia existente
-        const nombre = stories[key].name?.trim() || "";
-        const titulo = nombre !== "" ? `Historia de ${nombre}` : "Historia de Anónimo";
-        modalTitle.innerHTML = `<strong>${titulo}</strong>`;
-
-        // Sólo rellenamos el textarea
-        storyInput.value = stories[key].story;
-
-        // Ocultamos nombre y correo
-        inputGroup.style.display = 'none';
-        // Deshabilitamos textarea
-        storyInput.disabled = true;
-        // Ocultamos botón de enviar
-        submitBtn.style.display = 'none';
-        // Aplicamos estilo readonly
-        modalContent.classList.add("story-readonly");
-
-        // Mostramos los botones de redes
-        const prevButtons = document.querySelector(".social-buttons");
-        if (prevButtons) prevButtons.remove();
-        mostrarBotonesRedes(stories[key].story);
-
-      } else {
-        // Nuevo envío
-        modalTitle.textContent = "Comparte tu historia";
-
-        // Limpiamos y habilitamos campos
-        nameInput.value = "";
-        emailInput.value = "";
-        storyInput.value = "";
-        nameInput.disabled = false;
-        emailInput.disabled = false;
-        storyInput.disabled = false;
-
-        // Volvemos a mostrar inputs y botón
-        inputGroup.style.display = 'flex';  // o 'block'
-        submitBtn.style.display = 'block';
-        modalContent.classList.remove("story-readonly");
-
-        // Quitamos botones de redes si existían
-        const prevButtons = document.querySelector(".social-buttons");
-        if (prevButtons) prevButtons.remove();
-      }
-
-      // Abrimos modal
-      modal.style.display = "flex";
-    };
-
-    pixelGrid.appendChild(tile);
+// Cargar historias desde JSONBin y renderizar el grid
+async function cargarHistorias() {
+  try {
+    const res = await fetch(`${API_URL}/latest`, {
+      headers: { 'X-Master-Key': JSONBIN_API_KEY }
+    });
+    const data = await res.json();
+    stories = data.record || {};
+    renderGrid();
+  } catch (error) {
+    alert("Error al cargar historias desde la nube.");
   }
 }
 
+// Construir el grid 25x20 y marcar los revelados
+function renderGrid() {
+  pixelGrid.innerHTML = "";
 
-// Guardar historia nueva
-function submitStory() {
-  if (!emailInput.value || !storyInput.value) {
-    alert("Por favor, ingresa tu correo e historia.");
-    return;
-  }
+  for (let row = 0; row < 20; row++) {
+    for (let col = 0; col < 25; col++) {
+      const key = `tile_${row}_${col}`;
+      const tile = document.createElement("div");
+      tile.classList.add("pixel");
+      tile.dataset.key = key;
 
-  const data = {
-    name: nameInput.value || "Anónimo",
-    email: emailInput.value,
-    story: storyInput.value
-  };
+      const img = document.createElement("img");
+      img.src = `tiles/${key}.png`;
+      tile.appendChild(img);
 
-  stories[selectedKey] = data;
-  localStorage.setItem("stories", JSON.stringify(stories));
+      if (stories[key]) tile.classList.add("revealed");
 
-  document.querySelector(`[data-key="${selectedKey}"]`).classList.add("revealed");
-  modal.style.display = "none";
-
-  // Mostrar el modal de donación
-  const donationModal = document.getElementById("donationModal");
-  donationModal.style.display = "flex";
-
-  // Cerrar donación al hacer clic fuera
-  window.onclick = function (e) {
-    if (e.target === donationModal) {
-      donationModal.style.display = "none";
+      tile.onclick = () => abrirModalHistoria(key);
+      pixelGrid.appendChild(tile);
     }
-  };
+  }
 }
 
-// Cerrar modal si se hace clic fuera
-tile.onclick = () => {
+// Abrir modal: nuevo o historia guardada
+function abrirModalHistoria(key) {
   selectedKey = key;
-
-  const modalContent = document.getElementById("modalContent");
-  const inputGroup = document.getElementById("inputGroup");
-  const submitBtn = document.getElementById("submitButton");
 
   if (stories[key]) {
     const nombre = stories[key].name?.trim() || "";
     const titulo = nombre !== "" ? `Historia de ${nombre}` : "Historia de Anónimo";
     modalTitle.innerHTML = `<strong>${titulo}</strong>`;
-
-    nameInput.value = stories[key].name;
-    emailInput.value = stories[key].email;
     storyInput.value = stories[key].story;
-
-    nameInput.disabled = false;
-    emailInput.disabled = true;
-    inputGroup.style.display = "none";       // 👈 Ocultar campos
-    submitBtn.style.display = "none";        // 👈 Ocultar botón
-
+    inputGroup.style.display = 'none';
     storyInput.disabled = true;
+    submitBtn.style.display = 'none';
     modalContent.classList.add("story-readonly");
 
     const prevButtons = document.querySelector(".social-buttons");
     if (prevButtons) prevButtons.remove();
-
     mostrarBotonesRedes(stories[key].story);
+
   } else {
     modalTitle.textContent = "Comparte tu historia";
-
     nameInput.value = "";
     emailInput.value = "";
     storyInput.value = "";
-
-    inputGroup.style.display = "block";       // 👈 Mostrar campos
-    submitBtn.style.display = "block";        // 👈 Mostrar botón
-
     nameInput.disabled = false;
     emailInput.disabled = false;
     storyInput.disabled = false;
-
+    inputGroup.style.display = 'flex';
+    submitBtn.style.display = 'block';
     modalContent.classList.remove("story-readonly");
 
     const prevButtons = document.querySelector(".social-buttons");
@@ -165,16 +87,46 @@ tile.onclick = () => {
   }
 
   modal.style.display = "flex";
-};
-
-// Acordeón para categorías
-function toggleCategory(element) {
-  const content = element.nextElementSibling;
-  const isVisible = content.style.display === "block";
-  content.style.display = isVisible ? "none" : "block";
 }
 
-// Agregar botones de compartir en redes
+// Enviar historia a JSONBin
+async function submitStory() {
+  if (!emailInput.value || !storyInput.value) {
+    alert("Por favor, ingresa tu correo e historia.");
+    return;
+  }
+
+  const nuevaHistoria = {
+    name: nameInput.value || "Anónimo",
+    email: emailInput.value,
+    story: storyInput.value
+  };
+
+  stories[selectedKey] = nuevaHistoria;
+
+  try {
+    const res = await fetch(API_URL, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Master-Key': JSONBIN_API_KEY
+      },
+      body: JSON.stringify(stories)
+    });
+
+    if (res.ok) {
+      document.querySelector(`[data-key="${selectedKey}"]`).classList.add("revealed");
+      modal.style.display = "none";
+      document.getElementById("donationModal").style.display = "flex";
+    } else {
+      throw new Error("No se pudo guardar.");
+    }
+  } catch (error) {
+    alert("Error al guardar la historia en la nube.");
+  }
+}
+
+// Compartir en redes
 function mostrarBotonesRedes(texto) {
   const container = document.createElement("div");
   container.className = "social-buttons";
@@ -193,12 +145,12 @@ function mostrarBotonesRedes(texto) {
     {
       src: "./imagenes/twitter.png",
       alt: "Twitter",
-      link: `https://www.instagram.com/`, // No permite compartir directo con texto
+      link: `https://twitter.com/intent/tweet?text=${encodeURIComponent(texto)}`
     },
     {
       src: "./imagenes/linkedin.jpg",
       alt: "LinkedIn",
-      link: `https://www.tiktok.com/upload`, // Upload manual
+      link: `https://www.linkedin.com/sharing/share-offsite/?url=https://ejemplo.com`
     }
   ];
 
@@ -214,6 +166,19 @@ function mostrarBotonesRedes(texto) {
   modalContent.appendChild(container);
 }
 
+// Acordeón de categorías
+function toggleCategory(element) {
+  const content = element.nextElementSibling;
+  content.style.display = content.style.display === "block" ? "none" : "block";
+}
+
+// Cerrar modales
 function cerrarModalDonacion() {
   document.getElementById("donationModal").style.display = "none";
 }
+function cerrarModalFormulario() {
+  modal.style.display = "none";
+}
+
+// Ejecutar
+cargarHistorias();
