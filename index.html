@@ -1,0 +1,116 @@
+<head>
+  <meta charset="UTF-8" />
+  <title>Galería de Alimentos</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+  <div class="header-content">
+    <div class="header-left">
+      <img src="logo.png" alt="Logo" />
+      <div class="header-nav">
+        <span class="separator">|</span>
+        <a href="#" class="home-link">
+          <img src="./imagenes/home.jpg" alt="Inicio" class="icono-casa" />
+          <span>Inicio</span>
+        </a>
+      </div>
+    </div>
+    <span class="header-text">En cada imagen mil historias</span>
+  </div>
+</header>
+  <main>
+    <div class="grid-container" id="pixelGrid"></div>
+
+    <div class="sidebar">
+      <div class="category">
+        <h4 onclick="toggleCategory(this)">👶 Niños</h4>
+        <div class="category-content">
+          <img src="./imagenes/nino.jpg" />
+          <img src="./imagenes/familia.jpg" />
+        </div>
+      </div>
+
+      <div class="category">
+        <h4 onclick="toggleCategory(this)">👵 Ancianos</h4>
+        <div class="category-content">
+          <img src="./imagenes/viejo.jpg" />
+          <img src="./imagenes/viejo.jpg" />
+        </div>
+      </div>
+
+      <div class="category">
+        <h4 onclick="toggleCategory(this)">🍽️ Familia</h4>
+        <div class="category-content">
+          <img src="./imagenes/familia.jpg" />
+        </div>
+      </div>
+
+      <div class="category">
+        <h4 onclick="toggleCategory(this)">🏠 Albergue</h4>
+        <div class="category-content">
+          <img src="./imagenes/albergue.jpg" />
+        </div>
+      </div>
+      <div class="category">
+        <h4 onclick="toggleCategory(this)">✈️ Viajes</h4>
+        <div class="category-content">
+          <img src="./imagenes/albergue.jpg" />
+        </div>
+      </div>
+    </div>
+
+    
+  </main>
+
+ <div class="modal" id="formModal">
+  <div class="modal-content" id="modalContent">
+    <h3 id="modalTitle">Comparte tu historia</h3>
+
+    <!-- Agrupar los inputs dentro de #inputGroup -->
+    <div id="inputGroup">
+      <input type="text" id="name" placeholder="Tu nombre (opcional)">
+      <input type="email" id="email" placeholder="Correo electrónico" required>
+    </div>
+
+    <textarea id="story" placeholder="Describe tu historia..." rows="4"></textarea>
+    <button id="submitButton" onclick="submitStory()">Enviar</button>
+  </div>
+</div>
+</div>
+
+</div>
+<!-- Modal de Donación -->
+<div class="modal" id="donationModal">
+  <div class="modal-content donation-modal">
+    <div class="donation-header">
+      <span>Donación</span>
+      <button class="close-donation" onclick="cerrarModalDonacion()">×</button>
+    </div>
+    <div class="donation-body">
+      <h3>Tu aporte marca la diferencia</h3>
+      <p>
+        Con tu donación, ayudas a miles de ecuatorianos en situación vulnerable a tener acceso a alimentos de calidad.
+        <strong style="color: #ED6F1D;">¡Cada dólar donado puede proporcionar hasta 4 comidas!</strong>
+      </p>
+
+      <div class="donation-buttons">
+        <a href="https://tu-pasarela.com" target="_blank">
+          <img src="./imagenes/plux.jpg" alt="Pagar ahora" />
+        </a>
+        <a href="https://payphone.com" target="_blank">
+          <button class="btn-payphone">Donar con Payphone</button>
+        </a>
+      </div>
+
+      <div class="donation-impact">
+        <p class="impact-number">+12,500</p>
+        <p class="impact-text">familias beneficiadas este año gracias a generosos donantes como tú</p>
+      </div>
+    </div>
+  </div>
+</div>
+  <script src="script.js"></script>
+</body>
+</html>
